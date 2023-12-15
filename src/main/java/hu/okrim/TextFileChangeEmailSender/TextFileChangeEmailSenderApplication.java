@@ -18,7 +18,7 @@ public class TextFileChangeEmailSenderApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		if (args.length != 2) {
-			System.out.println("Usage: java -jar your-jar-file.jar <toEmail> <textFileFilePath>");
+			System.out.println("ERROR: You must provide the two required arguments when running the application. Usage: java -jar your-jar-file.jar <toEmail> <textFileFilePath>");
 		} else {
 			String toEmail = args[0];
 			String examinedFilePath = args[1];
