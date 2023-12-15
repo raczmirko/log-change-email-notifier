@@ -18,9 +18,9 @@ If you wish to use the app as is, a resources folder must be created in the same
 To run the JAR file you must follow the following syntax:
 ```java -jar <jarName> <toEmail> <examinedFilePath>```
 The items in *<brackets>* are the following:
-- <jarName> is the name of the generated JAR file. This can be changed in the *pom.xml* file, and is **TextFileChangeEmailSender-0.0.1-SNAPSHOT.jar** by default.
-- <toEmail> is the email address you wish to receive the notifications at.
-- <examinedFilePath> is the file path to the log file that is checked when the app is ran.
+- *<jarName>* is the name of the generated JAR file. This can be changed in the *pom.xml* file, and is **TextFileChangeEmailSender-0.0.1-SNAPSHOT.jar** by default.
+- *<toEmail>* is the email address you wish to receive the notifications at.
+- *<examinedFilePath>* is the file path to the log file that is checked when the app is ran.
 Example for running the app:
 ```java -jar TextFileChangeEmailSender-0.0.1-SNAPSHOT.jar email@email.com F:\Coding\targetFile.txt```
 ## Further config
