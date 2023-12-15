@@ -19,7 +19,7 @@ public class TextFileChangeService {
 
     // A file to keep track of the number of rows in the examined file
     // Every time the history file is update a new row is added in the following format:
-    //  <date>:<rowCount>
+    //  <date>=<rowCount>
     public void createHistoryFileIfNotExists() {
         File file = new File(RESOURCE_DIRECTORY + FILE_NAME);
 
@@ -40,12 +40,12 @@ public class TextFileChangeService {
 
     // If changes occurred then the examined file is also updated to reflect the changes
     boolean changesOccurredInExaminedFile(String examinedTextFilePath){
-        int lastRowCount = getLastRowCountFromHistory(examinedTextFilePath);
+        int lastRowCount = getLastRowCountFromHistory();
         int currentRowCount = countRowsInExaminedFile(examinedTextFilePath);
         return lastRowCount != currentRowCount;
     }
 
-    int getLastRowCountFromHistory(String examinedTextFilePath){
+    int getLastRowCountFromHistory(){
         String lastLine = null;
         int lastLineRowCount = 0;
 
@@ -70,7 +70,7 @@ public class TextFileChangeService {
     String getNewLinesFromExaminedFile(String examinedTextFilePath){
         StringBuilder newLinesString = new StringBuilder();
         newLinesString.append(String.format("These new lines have been added to the %s file:\n\n", examinedFileName));
-        int lastRowCount = getLastRowCountFromHistory(examinedTextFilePath);
+        int lastRowCount = getLastRowCountFromHistory();
         File examinedTextFile = new File(examinedTextFilePath);
 
         try (Scanner scanner = new Scanner(examinedTextFile)) {
