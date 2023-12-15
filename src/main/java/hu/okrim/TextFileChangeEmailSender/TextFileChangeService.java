@@ -1,7 +1,6 @@
 package hu.okrim.TextFileChangeEmailSender;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -9,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 @Service
@@ -18,6 +16,7 @@ public class TextFileChangeService {
     private String examinedFileName;
     private static final String FILE_NAME = "text_history";
     private static final String RESOURCE_DIRECTORY = "src/main/resources/";
+
     // A file to keep track of the number of rows in the examined file
     // Every time the history file is update a new row is added in the following format:
     //  <date>:<rowCount>
@@ -39,41 +38,11 @@ public class TextFileChangeService {
         }
     }
 
-    // If changes occurred then the history file is also updated to reflect the changes
-    boolean checkForChangesInExaminedFile(String examinedTextFilePath){
-        boolean changesOccurred = false;
+    // If changes occurred then the examined file is also updated to reflect the changes
+    boolean changesOccurredInExaminedFile(String examinedTextFilePath){
         int lastRowCount = getLastRowCountFromHistory(examinedTextFilePath);
-        String lastLine = null;
-        File examinedTextFile = new File(examinedTextFilePath);
-
-        if (examinedTextFile.exists()) {
-            try (Scanner scanner = new Scanner(new File(examinedTextFilePath))) {
-                while (scanner.hasNextLine()) {
-                    lastLine = scanner.nextLine();
-                }
-                // Current row count is set to 0 if the lastLine was null
-                int currentRowCount = lastLine == null ? 0 : Integer.parseInt(lastLine.split(":")[1]);
-                // Checking if the two rowCount values differ
-                if(lastRowCount != currentRowCount){
-                    changesOccurred = true;
-                    // Writing the new rowNumber into the history file
-                    File file = new File(RESOURCE_DIRECTORY + FILE_NAME);
-                    try (FileWriter writer = new FileWriter(file)) {
-                        writer.write(LocalDateTime.now() + "=" + currentRowCount);
-                        System.out.println("text_history file updated successfully.");
-                    } catch (IOException e) {
-                        System.err.println("Error updating the text_history file: " + e.getMessage());
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("The examined text file does not exist. " +
-                    "Make sure that the file path is correctly set in the " +
-                    "application.properties file!");
-        }
-        return changesOccurred;
+        int currentRowCount = countRowsInExaminedFile(examinedTextFilePath);
+        return lastRowCount != currentRowCount;
     }
 
     int getLastRowCountFromHistory(String examinedTextFilePath){
@@ -108,9 +77,9 @@ public class TextFileChangeService {
             int counter = 0;
             while (scanner.hasNextLine()) {
                 counter++;
-                // If the row is new then adding it to the array
-                if(counter > lastRowCount){
-                    newLinesString.append(scanner.nextLine());
+                String currentLine = scanner.nextLine();
+                if (counter > lastRowCount) {
+                    newLinesString.append(currentLine);
                     newLinesString.append("\n");
                 }
             }
@@ -118,5 +87,39 @@ public class TextFileChangeService {
             e.printStackTrace();
         }
         return newLinesString.toString();
+    }
+
+    int countRowsInExaminedFile(String examinedTextFilePath){
+        File examinedTextFile = new File(examinedTextFilePath);
+        int rowCount = 0;
+        if (examinedTextFile.exists()) {
+            try (Scanner scanner = new Scanner(examinedTextFile)) {
+                while (scanner.hasNextLine()) {
+                    scanner.nextLine();
+                    rowCount++;
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return rowCount;
+    }
+
+    void updateTextHistory(String examinedTextFilePath){
+        File examinedTextFile = new File(examinedTextFilePath);
+        // Writing the new rowNumber into the history file
+        if(examinedTextFile.exists()){
+            File file = new File(RESOURCE_DIRECTORY + FILE_NAME);
+            try (FileWriter writer = new FileWriter(file, true)) {
+                writer.write("\n" + LocalDateTime.now() + "=" + countRowsInExaminedFile(examinedTextFilePath));
+                System.out.println("text_history file updated successfully.");
+            } catch (IOException e) {
+                System.err.println("Error updating the text_history file: " + e.getMessage());
+            }
+        } else {
+            System.out.println("The examined text file does not exist. " +
+                    "Make sure that the file path is correctly set in the " +
+                    "application.properties file!");
+        }
     }
 }
