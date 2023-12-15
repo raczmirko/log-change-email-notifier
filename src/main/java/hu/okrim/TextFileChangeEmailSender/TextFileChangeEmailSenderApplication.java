@@ -9,17 +9,27 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TextFileChangeEmailSenderApplication implements CommandLineRunner {
 	@Autowired
 	private EmailSenderService senderService;
+	@Autowired
+	private TextFileChangeService textFileChangeService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(TextFileChangeEmailSenderApplication.class, args);
 	}
-@Override
-public void run(String... args) {
-	if (args.length == 0) {
-		System.out.println("Usage: java -jar your-jar-file.jar <toEmail>");
-	} else {
-		String toEmail = args[0];
-		senderService.sendMail(toEmail, "Test", "This is a test mail.");
+	@Override
+	public void run(String... args) {
+		if (args.length != 2) {
+			System.out.println("Usage: java -jar your-jar-file.jar <toEmail> <textFileFilePath>");
+		} else {
+			String toEmail = args[0];
+			String examinedFilePath = args[1];
+			textFileChangeService.createHistoryFileIfNotExists();
+			if(textFileChangeService.checkForChangesInExaminedFile(examinedFilePath)){
+				String bodyText = textFileChangeService.getNewLinesFromExaminedFile(examinedFilePath);
+				senderService.sendMail(toEmail, "Test", bodyText);
+			}
+			else{
+				System.out.println("No changes found. Finishing up...");
+			}
+		}
 	}
-}
 }
