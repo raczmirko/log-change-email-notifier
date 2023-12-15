@@ -15,7 +15,7 @@ public class TextFileChangeService {
     @Value("${target.file.filename}")
     private String examinedFileName;
     private static final String FILE_NAME = "text_history";
-    private static final String RESOURCE_DIRECTORY = "src/main/resources/";
+    private static final String RESOURCE_DIRECTORY = "resources/";
 
     // A file to keep track of the number of rows in the examined file
     // Every time the history file is update a new row is added in the following format:
