@@ -23,9 +23,10 @@ public class TextFileChangeEmailSenderApplication implements CommandLineRunner {
 			String toEmail = args[0];
 			String examinedFilePath = args[1];
 			textFileChangeService.createHistoryFileIfNotExists();
-			if(textFileChangeService.checkForChangesInExaminedFile(examinedFilePath)){
+			if(textFileChangeService.changesOccurredInExaminedFile(examinedFilePath)){
 				String bodyText = textFileChangeService.getNewLinesFromExaminedFile(examinedFilePath);
 				senderService.sendMail(toEmail, "Test", bodyText);
+				textFileChangeService.updateTextHistory(examinedFilePath);
 			}
 			else{
 				System.out.println("No changes found. Finishing up...");
